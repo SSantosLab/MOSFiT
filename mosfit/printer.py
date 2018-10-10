@@ -268,7 +268,7 @@ class Printer(object):
             if kind == 'bool':
                 options = [('', 'y'), ('', 'n')]
                 if default is None:
-                    default = 'n'
+                    default = 'y'
                 single = True
                 none_string = None
             if none_string is not None:
