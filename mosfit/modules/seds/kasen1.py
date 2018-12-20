@@ -149,5 +149,5 @@ class Kasen1(SED):
         
 
         seds = self.add_to_existing_seds(seds, **kwargs)
-        return {'sample_wavelengths': self._sample_wavelengths, 'seds': seds,'luminosities':self._luminosities, 'weight_geom1': self._weight_geom, 'mass_weight1': self._mass_weight }
+        return {'sample_wavelengths': self._sample_wavelengths, 'seds': seds }
 

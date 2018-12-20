@@ -145,4 +145,4 @@ class Kasen0(SED):
         seds[-1][np.isnan(seds[-1])] = 0.0
         
         seds = self.add_to_existing_seds(seds, **kwargs)
-        return {'sample_wavelengths': self._sample_wavelengths, 'seds': seds, 'seds0': seds, 'luminosities':self._luminosities, 'weight_geom0': self._weight_geom, 'mass_weight0': self._mass_weight }
+        return {'sample_wavelengths': self._sample_wavelengths, 'seds': seds }

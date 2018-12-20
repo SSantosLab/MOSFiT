@@ -133,7 +133,8 @@
             "kasen0"
         ],
         "requests":{
-            "band_wave_ranges": "photometry"
+            "band_wave_ranges": "photometry",
+	    "seds": "kasen0"
         },
         "replacements":{
             "vk":"vk1",
