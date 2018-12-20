@@ -9,22 +9,14 @@
 
 `MOSFiT` (**M**odular **O**pen-**S**ource **Fi**tter for **T**ransients) is a Python 2.7/3.x package for fitting, sharing, and estimating the parameters of transients via user-contributed transient models. Data for a transient can either be provided by the user in a wide range of formats (JSON, ASCII tables, CDS, LaTeX), or can be pulled automatically from one of the Open Catalogs (e.g. the [Open Supernova Catalog](https://sne.space), [Open TDE Catalog](https://tde.space), and [Open Nova Catalog](https://opennova.space)) by its name. With the use of an optional upload flag, fits performed by users can then be uploaded back to the Open Catalogs for the benefit of the transient community.<br clear="all">
 
+This version of MOSFiT was modified by Kamile Lukosiute to include a kilonova model based on [D. Kasen's Kilonova SEDs](https://github.com/dnkasen/Kasen_Kilonova_Models_2017). 
+
 ## Installation
+First, you will need to set up a new conda environment (please just trust me and make a new one) using the .yml file included (edit to name your conda environment what you would like it to be). 
 
-`MOSFiT` is available on `conda` and `pip`, and can be installed using:
+Then, you will need to download the reformatted SED pickles found [here]() and put the files (they are big) somewhere that makes sense. Next,in kasen0.py and kasen1.py, you will need to change `self._dir_path` to point to the directory. If you are using the DES machines, but them on the big disks. 
 
-```bash
-conda install -c conda-forge mosfit
-```
-
-or:
-
-```bash
-pip install mosfit
-```
-
-For a development install of `MOSFiT`, the repository should be cloned from GitHub and then installed into your Python environment via the `setup.py` script:
-
+Finally, you will be able to install MOSFiT. Use the setup.py script:
 ```bash
 git clone https://github.com/guillochon/MOSFiT.git
 cd MOSFiT
@@ -34,3 +26,5 @@ python setup.py develop
 ## Using MOSFiT
 
 For detailed instructions on using MOSFiT, please see our documentation on RTD: <http://mosfit.readthedocs.io/>
+
+For more details about the changes Kamile has made, ask Kamile. 
