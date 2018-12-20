@@ -14,7 +14,7 @@ This version of MOSFiT was modified by Kamile Lukosiute to include a kilonova mo
 ## Installation
 First, you will need to set up a new conda environment (please just trust me and make a new one) using the .yml file included (edit to name your conda environment what you would like it to be). 
 
-Then, you will need to download the reformatted SED pickles found [here]() and put the files (they are big) somewhere that makes sense. Next,in kasen0.py and kasen1.py, you will need to change `self._dir_path` to point to the directory. If you are using the DES machines, but them on the big disks. 
+Then, you will need to download the reformatted SED pickles found [here](https://github.com/SSantosLab/kasen_seds) and put the files (they are big) somewhere that makes sense. Next,in kasen0.py and kasen1.py, you will need to change `self._dir_path` to point to the directory containing the kasen_seds directory. If you are using the DES machines, put them on the big disks. 
 
 Finally, you will be able to install MOSFiT. Use the setup.py script:
 ```bash
