@@ -140,7 +140,7 @@ class Kasen1(SED):
                 sed = np.append(sed, weight * kasen_seds['SEDs'][t_closest_i][w_closest_i] )
             
             # Calculate luminosity from sed
-            L_t = np.trapz(kasen_seds['SEDs'][t_closest_i], x=self._kasen_wavs)
+            L_t = np.trapz(weight * kasen_seds['SEDs'][t_closest_i], x=self._kasen_wavs)
             self._luminosities[li] = self._luminosities[li] +  L_t
             lums1.append(L_t)
             seds.append(sed)
