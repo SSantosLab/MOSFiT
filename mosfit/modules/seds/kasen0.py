@@ -35,7 +35,7 @@ class Kasen0(SED):
         super(Kasen0, self).__init__(**kwargs)
 
         # Read in times and frequencies arrays (same for all SEDs)
-        self._dir_path = '/data/des51.b/data/kamile/'
+        self._dir_path = '/home/kl/thesis/'
         self._kasen_wavs = pickle.load( open(os.path.join(self._dir_path, 'kasen_seds/wavelength_angstroms.p'), "rb"))
         self._kasen_times = pickle.load( open(os.path.join(self._dir_path, 'kasen_seds/times_days.p'), "rb"))
 
@@ -97,6 +97,7 @@ class Kasen0(SED):
         czp1 = cc / zp1
 
         seds = []
+        lums0 = []
         rest_wavs_dict = {}
 
         # Find nearest neighbors to the Kasen-calculated simulation
@@ -138,11 +139,11 @@ class Kasen0(SED):
             # Calculate luminosity from sed
             L_t = np.trapz(kasen_seds['SEDs'][t_closest_i], x=self._kasen_wavs)
             self._luminosities[li] = self._luminosities[li] +  L_t
-
+            lums0.append(L_t)
             seds.append(sed)
             
         #This line turns all the nans to 0s
         seds[-1][np.isnan(seds[-1])] = 0.0
         
         seds = self.add_to_existing_seds(seds, **kwargs)
-        return {'sample_wavelengths': self._sample_wavelengths, 'seds': seds }
+        return {'sample_wavelengths': self._sample_wavelengths, 'seds': seds,  'lum_0': lums0}
