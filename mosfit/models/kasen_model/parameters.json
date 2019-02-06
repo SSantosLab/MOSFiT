@@ -30,5 +30,8 @@
     },
     "xlan0":{
         "value":1e-4
-    }
+    },
+    "sedoffset":{
+	"value":0.0
+}
 }

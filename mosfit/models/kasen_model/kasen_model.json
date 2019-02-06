@@ -7,6 +7,12 @@
             "bibcode": "2017arXiv171011576V"
         }
     ],
+   "sedoffset":{
+	"kind":"parameter",
+	"value":0.0,
+	"class":"parameter",
+	"latex":"SED"
+     },
    "ebv":{
         "kind":"parameter",
         "value":0.0,
