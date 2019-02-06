@@ -135,7 +135,7 @@ class Kasen0(SED):
             for w in rest_wavs:
             # find index of closest wav
                 w_closest_i = np.abs(self._kasen_wavs-w).argmin()
-                sed = np.append(sed, weight * kasen_seds['SEDs'][t_closest_i][w_closest_i] ) + self.sed_offset
+                sed = np.append(sed, weight * kasen_seds['SEDs'][t_closest_i][w_closest_i] ) + self._sed_offset
             
             # Calculate luminosity from sed
             L_t = np.trapz(weight * kasen_seds['SEDs'][t_closest_i], x=self._kasen_wavs)
