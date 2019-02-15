@@ -35,7 +35,7 @@ class Kasen0(SED):
         super(Kasen0, self).__init__(**kwargs)
 
         # Read in times and frequencies arrays (same for all SEDs)
-        self._dir_path = '/data/des51.b/data/kamile'
+        self._dir_path = '/home/kl/thesis/'
         self._kasen_wavs = pickle.load( open(os.path.join(self._dir_path, 'kasen_seds/wavelength_angstroms.p'), "rb"))
         self._kasen_times = pickle.load( open(os.path.join(self._dir_path, 'kasen_seds/times_days.p'), "rb"))
 
@@ -70,7 +70,6 @@ class Kasen0(SED):
         self._band_indices = kwargs['all_band_indices']
         self._frequencies = kwargs['all_frequencies']
 
-	self._sed_offset = kwargs[self.key('sedoffset')]
 
         # Physical parameters to index Kasen simulations
         self._vk = kwargs[self.key('vk')]
@@ -135,7 +134,7 @@ class Kasen0(SED):
             for w in rest_wavs:
             # find index of closest wav
                 w_closest_i = np.abs(self._kasen_wavs-w).argmin()
-                sed = np.append(sed, weight * kasen_seds['SEDs'][t_closest_i][w_closest_i] ) + self.sed_offset
+                sed = np.append(sed, weight * kasen_seds['SEDs'][t_closest_i][w_closest_i] )
             
             # Calculate luminosity from sed
             L_t = np.trapz(weight * kasen_seds['SEDs'][t_closest_i], x=self._kasen_wavs)
