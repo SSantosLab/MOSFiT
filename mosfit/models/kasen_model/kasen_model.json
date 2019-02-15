@@ -11,7 +11,7 @@
 	"kind":"parameter",
 	"value":0.0,
 	"class":"parameter",
-	"latex":"S"
+	"latex":"SED"
      },
    "ebv":{
         "kind":"parameter",
@@ -113,8 +113,7 @@
             "phi",
 	    "vk0",
 	    "xlan0",
-	    "Msph0",
-	    "sedoffset"
+	    "Msph0"
         ],
         "requests":{
             "band_wave_ranges": "photometry"
