@@ -135,10 +135,12 @@ class Kasen0(SED):
                 w_closest_i = np.abs(self._kasen_wavs-w).argmin()
                 sed = np.append(sed, weight * kasen_seds['SEDs'][t_closest_i][w_closest_i] )
 
-	    # replace who array with 0s if t = 0 (hacky fix but whatver I have like two thesis weeks left)
-	    if self._my_times[li] == 0.0:
-		sed[sed >= 0.] = 10. # should be all values (can't have neg luminosity
-            
+           
+
+            # replace array w/very small val if t = 0 (hacky fix but whatver I have like two thesis weeks left)
+            if self._my_times[li] == 0.0:
+                sed[sed >= 0.] = 1.e30 # should be all values (can't have neg luminosity
+ 
             # Calculate luminosity from sed
             L_t = np.trapz(weight * kasen_seds['SEDs'][t_closest_i], x=self._kasen_wavs)
             self._luminosities[li] = self._luminosities[li] +  L_t

@@ -140,9 +140,9 @@ class Kasen1(SED):
                 sed = np.append(sed, weight * kasen_seds['SEDs'][t_closest_i][w_closest_i] )
 
 
-            # replace who array with 0s if t = 0 (hacky fix but whatver I have like two thesis weeks left)
+            # replace array w/very small val if t = 0 (hacky fix but whatver I have like two thesis weeks left)
             if self._times[li] == 0.0:
-                sed[sed >= 0.] = 10. # should be all values (can't have neg luminosity
+                sed[sed >= 0.] = 1.e30 # should be all values (can't have neg luminosity
 
 
 	    # Calculate luminosity from sed
