@@ -35,7 +35,7 @@ class Kasen0(SED):
         super(Kasen0, self).__init__(**kwargs)
 
         # Read in times and frequencies arrays (same for all SEDs)
-        self._dir_path = '/home/kl/thesis/'
+        self._dir_path = '/data/des51.b/data/kamile/'
         self._kasen_wavs = pickle.load( open(os.path.join(self._dir_path, 'kasen_seds/wavelength_angstroms.p'), "rb"))
         self._kasen_times = pickle.load( open(os.path.join(self._dir_path, 'kasen_seds/times_days.p'), "rb"))
 
@@ -76,7 +76,6 @@ class Kasen0(SED):
         self._xlan = kwargs[self.key('xlan')]
         self._mass = kwargs[self.key('Msph')]
         
-        
         # Total weight function
         # TYPE 0 == SHOCK HEATED SO GEOMETRIC FACTOR IS JUST FOR CONE
         self._phi = kwargs[self.key('phi')] # half opening
@@ -104,8 +103,8 @@ class Kasen0(SED):
         m_closest = self.MASS_S[(np.abs(self.MASS-self._mass)).argmin()]
         v_closest = self.VKIN_S[(np.abs(self.VKIN-self._vk)).argmin()]
         x_closest = self.XLAN_S[(np.abs(self.XLAN-self._xlan)).argmin()]
-
-         # if it's that pesky missing one
+        
+	# if it's that pesky missing one
         if x_closest == '1e-1' and m_closest == '0.1' and v_closest == '0.30' :
             m_closest = '0.075'
             
@@ -135,6 +134,10 @@ class Kasen0(SED):
             # find index of closest wav
                 w_closest_i = np.abs(self._kasen_wavs-w).argmin()
                 sed = np.append(sed, weight * kasen_seds['SEDs'][t_closest_i][w_closest_i] )
+
+	    # replace who array with 0s if t = 0 (hacky fix but whatver I have like two thesis weeks left)
+	    if self._my_times[li] == 0.0:
+		sed[sed >= 0.] = 10. # should be all values (can't have neg luminosity
             
             # Calculate luminosity from sed
             L_t = np.trapz(weight * kasen_seds['SEDs'][t_closest_i], x=self._kasen_wavs)
@@ -144,6 +147,4 @@ class Kasen0(SED):
             
         #This line turns all the nans to 0s
         seds[-1][np.isnan(seds[-1])] = 0.0
-        
-        seds = self.add_to_existing_seds(seds, **kwargs)
         return {'sample_wavelengths': self._sample_wavelengths, 'seds': seds,  'lum_0': lums0}
