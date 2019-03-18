@@ -60,37 +60,37 @@
         "kind":"parameter",
         "value":0.24,
         "class":"parameter",
-        "latex":"v_c"
+        "latex":"v_{k1}"
     },
     "Msph1":{
         "kind":"parameter",
         "value":0.1,
         "class":"parameter",
-        "latex":"m"
+        "latex":"M_1"
     },
     "xlan1":{
         "kind":"parameter",
         "value":1e-1,
         "class":"parameter",
-        "latex":"X"
+        "latex":"X_1"
     },
     "vk0":{
         "kind":"parameter",
         "value":0.36,
         "class":"parameter",
-        "latex":"v_c"
+        "latex":"v_{k0}"
     },
     "Msph0":{
         "kind":"parameter",
         "value":0.075,
         "class":"parameter",
-        "latex":"m"
+        "latex":"M_0"
     },
     "xlan0":{
         "kind":"parameter",
         "value":1e-1,
         "class":"parameter",
-        "latex":"X"
+        "latex":"X_0"
     },
     "fakelum":{
         "kind":"engine",
