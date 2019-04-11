@@ -223,6 +223,13 @@ def get_parser(only=None, printer=None):
         help=prt.text('parser_user_fixed_parameters'))
 
     parser.add_argument(
+	'--true-values',
+	dest='true_vals',
+	default=[],
+	nargs='+',
+	help=prt.text('parser_user_fixed_parameters'))
+
+    parser.add_argument(
         '--release-parameters',
         '-r',
         dest='user_released_parameters',
@@ -625,6 +632,7 @@ def main():
         args.limiting_magnitude = 20.0
 
     args.return_fits = False
+
 
     if (isinstance(args.extrapolate_time, list) and
             len(args.extrapolate_time) == 0):

@@ -169,10 +169,13 @@ class Fitter(object):
                    local_data_only=False,
                    method=None,
                    seed=None,
+		   true_vals = [],
                    **kwargs):
         """Fit a list of events with a list of models."""
         global model
-        if start_time is False:
+        
+	self.true_vals = true_vals	
+	if start_time is False:
             start_time = time.time()
 
         self._seed = seed
