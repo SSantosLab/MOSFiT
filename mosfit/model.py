@@ -637,7 +637,6 @@ class Model(object):
                   task in extra_fixed_parameters):
                 self._user_fixed_parameters.append(task)
         self._num_free_parameters = len(self._free_parameters)
-
     def is_parameter_fixed_by_user(self, parameter):
         """Return whether a parameter is fixed by the user."""
         return parameter in self._user_fixed_parameters
@@ -781,7 +780,6 @@ class Model(object):
             self._modules[self._free_parameters[i]].prior_icdf(x)
             for i, x in enumerate(draw)
         ]
-
     def draw_walker(self, test=True, walkers_pool=[], replace=False,
                     weights=None):
         """Draw a walker randomly.
@@ -789,44 +787,96 @@ class Model(object):
         Draw a walker randomly from the full range of all parameters, reject
         walkers that return invalid scores.
         """
-        p = None
-        chosen_one = None
-        draw_cnt = 0
-        while p is None:
-            draw_cnt += 1
-            draw = np.random.uniform(
-                low=0.0, high=1.0, size=self._num_free_parameters)
-            draw = self.draw_from_icdf(draw)
-            if len(walkers_pool):
-                if not replace:
-                    chosen_one = 0
-                else:
-                    chosen_one = np.random.choice(range(len(walkers_pool)),
-                                                  p=weights)
-                for e, elem in enumerate(walkers_pool[chosen_one]):
-                    if elem is not None:
-                        draw[e] = elem
-            if not test:
-                p = draw
-                score = None
-                break
-            score = self.ln_likelihood(draw)
-            if draw_cnt >= self.DRAW_LIMIT and not self._draw_limit_reached:
-                self._printer.message('draw_limit_reached', warning=True)
-                self._draw_limit_reached = True
-            if ((not isnan(score) and np.isfinite(score) and
-                 (not isinstance(self._fitter._draw_above_likelihood, float) or
-                  score > self._fitter._draw_above_likelihood)) or
-                    draw_cnt >= self.DRAW_LIMIT):
-                p = draw
+        print('from draw_walker..')
+        if self._fitter.true_vals: # if i've specified true values
+            true_vals_range = {u'theta':[0., 1.57], u'phi':[0.17, 1.04]}
+            true_vals = {}        
+            for i in range(0,len(self._fitter.true_vals), 2):
+                true_vals[unicode(self._fitter.true_vals[i])] = float(self._fitter.true_vals[i+1])
+    
+            p = None
+            chosen_one = None
+            draw_cnt = 0
+            while p is None:
+                draw_cnt += 1
+		# below is a conversion from truth value to a 0-1 range
+                truth = [(true_vals[i]-true_vals_range[i][0])/(true_vals_range[i][1] - true_vals_range[i][0]) for i in self._free_parameters]
+                print(truth)
+		draw = [i + np.random.uniform(low=-.1, high=.1) for i in truth] # +- 10% LOL this might totally eb a problem
+		if len(walkers_pool):
+                    if not replace:
+                        chosen_one = 0
+                    else:
+                        chosen_one = np.random.choice(range(len(walkers_pool)),
+                                                      p=weights)
+                    for e, elem in enumerate(walkers_pool[chosen_one]):
+                        if elem is not None:
+                            draw[e] = elem
+                if not test:
+                    p = draw
+                    score = None
+                    break
+                score = self.ln_likelihood(draw)
+                if draw_cnt >= self.DRAW_LIMIT and not self._draw_limit_reached:
+                    self._printer.message('draw_limit_reached', warning=True)
+                    self._draw_limit_reached = True
+                if ((not isnan(score) and np.isfinite(score) and
+                     (not isinstance(self._fitter._draw_above_likelihood, float) or
+                      score > self._fitter._draw_above_likelihood)) or
+                        draw_cnt >= self.DRAW_LIMIT):
+                    p = draw
 
-        if not replace and chosen_one is not None:
-            del(walkers_pool[chosen_one])
-            if weights is not None:
-                del(weights[chosen_one])
-                if len(weights) and None not in weights:
-                    totw = np.sum(weights)
-                    weights = [x / totw for x in weights]
+            if not replace and chosen_one is not None:
+                del(walkers_pool[chosen_one])
+                if weights is not None:
+                    del(weights[chosen_one])
+                    if len(weights) and None not in weights:
+                        totw = np.sum(weights)
+                        weights = [x / totw for x in weights]
+	    print(p, score)
+            return (p, score)
+    
+        else:
+            p = None
+            chosen_one = None
+            draw_cnt = 0
+            while p is None:
+                draw_cnt += 1
+                draw  = np.random.uniform(
+                    low=0.0, high=1.0, size=self._num_free_parameters)
+                draw = self.draw_from_icdf(draw)
+                if len(walkers_pool):
+                    if not replace:
+                        chosen_one = 0
+                    else:
+                        chosen_one = np.random.choice(range(len(walkers_pool)),
+                                                      p=weights)
+                    for e, elem in enumerate(walkers_pool[chosen_one]):
+                        if elem is not None:
+                            draw[e] = elem
+                if not test:
+                    p = draw
+                    score = None
+                    break
+                score = self.ln_likelihood(draw)
+                if draw_cnt >= self.DRAW_LIMIT and not self._draw_limit_reached:
+                    self._printer.message('draw_limit_reached', warning=True)
+                    self._draw_limit_reached = True
+                if ((not isnan(score) and np.isfinite(score) and
+                     (not isinstance(self._fitter._draw_above_likelihood, float) or
+                      score > self._fitter._draw_above_likelihood)) or
+                        draw_cnt >= self.DRAW_LIMIT):
+                    p = draw
+
+            if not replace and chosen_one is not None:
+                del(walkers_pool[chosen_one])
+                if weights is not None:
+                    del(weights[chosen_one])
+                    if len(weights) and None not in weights:
+                        totw = np.sum(weights)
+                        weights = [x / totw for x in weights]
+
+        print(p,score)
         return (p, score)
 
     def get_max_depth(self, tag, parent, max_depth):
