@@ -789,7 +789,7 @@ class Model(object):
         """
         print('from draw_walker..')
         if self._fitter.true_vals: # if i've specified true values
-            true_vals_range = {u'theta':[0., 1.57], u'phi':[0.17, 1.04]}
+            true_vals_range = {u'theta':[0., 1.57], u'phi':[0.17, 1.39]}
             true_vals = {}        
             for i in range(0,len(self._fitter.true_vals), 2):
                 true_vals[unicode(self._fitter.true_vals[i])] = float(self._fitter.true_vals[i+1])
