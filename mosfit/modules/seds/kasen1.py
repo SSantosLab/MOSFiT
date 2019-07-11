@@ -84,15 +84,14 @@ class Kasen1(SED):
         self._theta = kwargs[self.key('theta')] # viewing
 
         # mass fractional weight to convert between spherical and conical mass
-        self._mass_weight = 1. -  ( 0.5 * ( (2+np.cos(self._phi) ) *
+        self._mass_weight =  ( 0.5 * ( (2+np.cos(self._phi) ) *
             ( 1 - np.cos(self._phi) )**2 +
             ( np.sin(self._phi)**2 ) * np.cos(self._phi) ) )
 
 
-
         self._weight_geom = self.weight(self._phi, self._theta)
 
-        weight = self._mass_weight * self._weight_geom
+        weight = 1./(1-self._mass_weight) * self._weight_geom
  
         # Some temp vars for speed.
         cc = self.C_CONST
