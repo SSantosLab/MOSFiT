@@ -87,9 +87,8 @@ class Kasen0(SED):
         self._mass_weight =  ( 0.5 * ( (2+np.cos(self._phi) ) *
             ( 1 - np.cos(self._phi) )**2 +
             ( np.sin(self._phi)**2 ) * np.cos(self._phi) ) )
- 
 
-    	weight = self._mass_weight * self._weight_geom
+    	weight = (1./self._mass_weight) * self._weight_geom
         # Some temp vars for speed.
         cc = self.C_CONST
         zp1 = 1.0 + kwargs[self.key('redshift')]
@@ -115,14 +114,18 @@ class Kasen0(SED):
                 kasen_seds['SEDs'] = i['SEDs']
                 break
         
-
-        # For each time (luminosities as proxy)
+	print(self._my_times)
+	print(self._my_times.shape)
+        print(self._frequencies)
+	# For each time (luminosities as proxy)
         for li, lum in enumerate(self._luminosities):
             bi = self._band_indices[li]
             if bi >= 0:
+		print('ne')
                 rest_wavs = rest_wavs_dict.setdefault(
                     bi, self._sample_wavelengths[bi] / zp1)
             else:
+		print('ye')
                 rest_wavs = np.array(  # noqa: F841
                     [czp1 / self._frequencies[li]])
 
@@ -134,7 +137,7 @@ class Kasen0(SED):
             # find index of closest wav
                 w_closest_i = np.abs(self._kasen_wavs-w).argmin()
                 sed = np.append(sed, weight * kasen_seds['SEDs'][t_closest_i][w_closest_i] )
-
+	  
            
 
             # replace array w/very small val if t = 0 (hacky fix but whatver I have like two thesis weeks left)
