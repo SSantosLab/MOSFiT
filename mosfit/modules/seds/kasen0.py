@@ -35,8 +35,8 @@ class Kasen0(SED):
         super(Kasen0, self).__init__(**kwargs)
 
         # Read in times and frequencies arrays (same for all SEDs)
-        self._dir_path = '/data/des51.b/data/kamile/'
-        self._kasen_wavs = pickle.load( open(os.path.join(self._dir_path, 'kasen_seds/wavelength_angstroms.p'), "rb"))
+        self._dir_path = '/home/kamile/Research/'
+        self._kasen_wavs = pickle.load( open(os.path.join(self._dir_path, 'kasen_seds/frequency_angstroms.p'), "rb"))
         self._kasen_times = pickle.load( open(os.path.join(self._dir_path, 'kasen_seds/times_days.p'), "rb"))
 
         # create in memory the kasen_seds to later pick from 
@@ -69,7 +69,6 @@ class Kasen0(SED):
         self._my_times = kwargs[self.key('rest_times')]
         self._band_indices = kwargs['all_band_indices']
         self._frequencies = kwargs['all_frequencies']
-
 
         # Physical parameters to index Kasen simulations
         self._vk = kwargs[self.key('vk')]
@@ -114,21 +113,30 @@ class Kasen0(SED):
                 kasen_seds['SEDs'] = i['SEDs']
                 break
         
+<<<<<<< Updated upstream
 	print(self._my_times)
 	print(self._my_times.shape)
         print(self._frequencies)
 	# For each time (luminosities as proxy)
+=======
+        ah = []
+
+        # For each time (luminosities as proxy)
+>>>>>>> Stashed changes
         for li, lum in enumerate(self._luminosities):
             bi = self._band_indices[li]
             if bi >= 0:
 		print('ne')
                 rest_wavs = rest_wavs_dict.setdefault(
                     bi, self._sample_wavelengths[bi] / zp1)
+                print('ye')
             else:
 		print('ye')
                 rest_wavs = np.array(  # noqa: F841
                     [czp1 / self._frequencies[li]])
+                print('ne')
 
+            ah.append((len(rest_wavs)))
             # Find corresponding closest time
             t_closest_i = (np.abs(self._kasen_times-self._my_times[li])).argmin()
             # Evaluate the SED at the rest frame wavelengths 
@@ -149,7 +157,7 @@ class Kasen0(SED):
             self._luminosities[li] = self._luminosities[li] +  L_t
             lums0.append(L_t)
             seds.append(sed)
-            
+        print(ah)
         #This line turns all the nans to 0s
         seds[-1][np.isnan(seds[-1])] = 0.0
         return {'sample_wavelengths': self._sample_wavelengths, 'seds': seds,  'lum_0': lums0}
