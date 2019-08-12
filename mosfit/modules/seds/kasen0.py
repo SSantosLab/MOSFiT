@@ -3,161 +3,181 @@ import numpy as np
 from mosfit.modules.seds.sed import SED
 import pickle 
 from astropy import constants as c
-from astropy import units as u
+from tensorflow import keras
 import os
-
+import sys
 
 
 # Important: Only define one ``Module`` class per file.
 
 
 class Kasen0(SED):
-    '''
+    """
     Defining the Kasen-simulation based SED
 
     FOR TYPE 0 == SHOCK HEATED EJECTA
     #Frankencode
-    Kamile Lukosiute October 2018
-    '''
-
-    # Kasen-calculated parameters
-    MASS = np.array([.001, .0025, .005, .01, .02, .025, .03, .04, .05, .075, .1])
-    VKIN = np.array([.03, .05, .1, .2, .3])
-    XLAN = np.array([1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-9])
-
-    MASS_S = np.array(['0.001', '0.0025', '0.005', '0.010' ,'0.020', '0.025', '0.030', '0.040', '0.050', '0.075', '0.1' ])
-    VKIN_S = np.array(['0.03', '0.05', '0.10', '0.20', '0.30'])
-    XLAN_S = np.array(['1e-1', '1e-2', '1e-3', '1e-4', '1e-5', '1e-9'])
+    Kamile Lukosiute August 2019
+    """
 
     C_CONST = c.c.cgs.value
 
     def __init__(self, **kwargs):
         super(Kasen0, self).__init__(**kwargs)
+        self.dir = os.path.dirname(os.path.realpath(__file__))
+        # self.kasen_wavs = pickle.load(open(os.path.join(self.dir, 'wavelength_angstroms.p'), 'rb'))
+        self.kasen_wavs = np.load(os.path.join(self.dir, 'wavelengths.npy'))
+        self.kasen_times  = pickle.load(open(os.path.join(self.dir, 'times_days.p'), 'rb'))
+        self.KSNN = keras.models.load_model(os.path.join(self.dir, 'weights-5805.hdf5'))
 
-        # Read in times and frequencies arrays (same for all SEDs)
-        self._dir_path = '/home/kamile/Research/'
-        self._kasen_wavs = pickle.load( open(os.path.join(self._dir_path, 'kasen_seds/frequency_angstroms.p'), "rb"))
-        self._kasen_times = pickle.load( open(os.path.join(self._dir_path, 'kasen_seds/times_days.p'), "rb"))
+        self.closest_wavs_ind = np.vectorize(self.find_closest)
 
-        # create in memory the kasen_seds to later pick from 
-        self._all_kasen_seds = []
-        for m in self.MASS_S:
-            for v in self.VKIN_S:
-                for x in self.XLAN_S:
-                            fname = 'kasen_seds/knova_d1_n10_m' + m + '_vk' + v + '_fd1.0_Xlan' + x + '.0.p'
-                            if fname == 'kasen_seds/knova_d1_n10_m0.1_vk0.30_fd1.0_Xlan1e-1.0.p':
-                                continue
-                            kasen_sed = pickle.load( open(os.path.join(self._dir_path, fname) , "rb" ))
-                            self._all_kasen_seds.append(kasen_sed)
+    def find_closest(self,x):
+        return np.abs(self.kasen_wavs - x).argmin()
 
 
-    def weight(self, phi, theta):
-        # viewing angle heta, half opening angle phi
-        if phi + theta > np.pi/2.: 
-            x = ( (np.sin(phi)**2. - np.cos(theta)**2.)**.5/
-                np.sin(theta) )
+    @staticmethod
+    def m_weight(phi):
+        """
+        Calculates the scaling due to mass compression
+        :param phi:
+        :return: mass weight
+        """
+        return (0.5 * ((2 + np.cos(phi)) *
+                (1 - np.cos(phi)) ** 2 +
+                (np.sin(phi) ** 2) * np.cos(phi)))
+
+    @staticmethod
+    def g_weight(phi, theta):
+        """
+        Calculates the scaling due to viewing angle
+        :param phi:
+        :param theta:
+        :return: geometric weight
+        """
+        if phi + theta > np.pi / 2.:
+            x = ((np.sin(phi) ** 2. - np.cos(theta) ** 2.) ** .5 /
+                 np.sin(theta))
         else:
-            x = 0 
+            x = 0
 
-        weight0 = ( (np.pi*(np.sin(phi)**2.)*(np.cos(theta)) + 
-            2*(1-np.cos(theta))*(np.arcsin(x) - x*(1 - x**2.)**.5))/np.pi )
-	return weight0
+        weight0 = ((np.pi * (np.sin(phi) ** 2.) * (np.cos(theta)) +
+                    2 * (1 - np.cos(theta)) * (np.arcsin(x) - x * (1 - x ** 2.) ** .5)) / np.pi)
+        return weight0
+
+
+
+
+    @staticmethod
+    def m_realtonn(x):
+        x_log = np.log(x)
+        maxi = -2.3025850929940455
+        mini = -6.907755278982137
+        return (x_log - mini) / (maxi - mini)
+
+    @staticmethod
+    def v_realtonn(x):
+        maxi = 0.4
+        mini = 0.03
+        return (x - mini) / (maxi - mini)
+
+    @staticmethod
+    def x_realtonn(x):
+        x_log = np.log(x)
+        maxi = -2.302585092994047
+        mini = -20.72326583694641
+        return (x_log - mini) / (maxi - mini)
+
+    @staticmethod
+    def t_realtonn(x):
+        maxi = 14.34999942779541
+        mini = 0.05000000074505806
+        return (x - mini) / (maxi - mini)
+
+    @staticmethod
+    def m_nntoreal(x):
+        maxi = -2.3025850929940455
+        mini = -6.907755278982137
+        return np.exp(x * (maxi - mini) + mini)
+
+    @staticmethod
+    def v_nntoreal(x):
+        maxi = 0.4
+        mini = 0.03
+        return x * (maxi - mini) + mini
+
+    @staticmethod
+    def x_nntoreal(x):
+        maxi = -2.302585092994047
+        mini = -20.72326583694641
+        return np.exp(x * (maxi - mini) + mini)
+
+    @staticmethod
+    def t_nntoreal(x):
+        maxi = 14.34999942779541
+        mini = 0.05000000074505806
+        return x * (maxi - mini) + mini
+
+    #    def total_x_nntoreal(x):
+    #      return np.array([self.m_nntoreal(x[0]), self.v_NNtoreal(x[1]), self.x_NNtoreal(x[2]), self.t_NNtoreal(x[3])])
+
+    @staticmethod
+    def lum_nntoreal(x):
+        # given neural net result of prediction, returns the physical prediction
+        mini = -11.512925464970229
+        maxi = -0.028132106114705117
+        return (np.exp(x * (maxi - mini) + mini) - .00001) * 6.297913324264987e+38
 
     def process(self, **kwargs):
+        # 57982.529
         kwargs = self.prepare_input(self.key('luminosities'), **kwargs)
         self._luminosities = kwargs[self.key('luminosities')]
         self._my_times = kwargs[self.key('rest_times')]
         self._band_indices = kwargs['all_band_indices']
         self._frequencies = kwargs['all_frequencies']
 
-        # Physical parameters to index Kasen simulations
         self._vk = kwargs[self.key('vk')]
         self._xlan = kwargs[self.key('xlan')]
         self._mass = kwargs[self.key('Msph')]
-        
-        # Total weight function
-        # TYPE 0 == SHOCK HEATED SO GEOMETRIC FACTOR IS JUST FOR CONE
         self._phi = kwargs[self.key('phi')] # half opening
         self._theta = kwargs[self.key('theta')] # viewing
-        self._weight_geom = self.weight(self._phi, self._theta)
-       
+        weight = self.m_weight(self._phi)*self.g_weight(self._phi, self._theta)
 
-        # mass fractional weight to go from spherical (Kasen) mass to conical mass
-        self._mass_weight =  ( 0.5 * ( (2+np.cos(self._phi) ) *
-            ( 1 - np.cos(self._phi) )**2 +
-            ( np.sin(self._phi)**2 ) * np.cos(self._phi) ) )
-
-    	weight = (1./self._mass_weight) * self._weight_geom
-        # Some temp vars for speed.
         cc = self.C_CONST
         zp1 = 1.0 + kwargs[self.key('redshift')]
         czp1 = cc / zp1
 
-        seds = []
-        lums0 = []
+        lums = []
         rest_wavs_dict = {}
 
-        # Find nearest neighbors to the Kasen-calculated simulation
-        m_closest = self.MASS_S[(np.abs(self.MASS-self._mass)).argmin()]
-        v_closest = self.VKIN_S[(np.abs(self.VKIN-self._vk)).argmin()]
-        x_closest = self.XLAN_S[(np.abs(self.XLAN-self._xlan)).argmin()]
-        
-	# if it's that pesky missing one
-        if x_closest == '1e-1' and m_closest == '0.1' and v_closest == '0.30' :
-            m_closest = '0.075'
-            
-        kasen_seds = {}
-        # Find dictionary that corresponds to m_closest, v_closest, x_closest
-        for i in self._all_kasen_seds:
-            if i['Xlan'] == float(x_closest) and  i['mass'] == float(m_closest) and i['vk'] == float(v_closest):
-                kasen_seds['SEDs'] = i['SEDs']
-                break
-        
-<<<<<<< Updated upstream
-	print(self._my_times)
-	print(self._my_times.shape)
-        print(self._frequencies)
-	# For each time (luminosities as proxy)
-=======
-        ah = []
+        kasen_params = np.array([self.m_realtonn(self._mass), self.v_realtonn(self._vk), self.x_realtonn(self._xlan)])
+        times_trans = self.t_realtonn(np.array([self._my_times])).T
+        nn_input = np.hstack((np.vstack([kasen_params]*len(self._my_times)), times_trans))
+        predictions = self.lum_nntoreal(self.KSNN.predict(nn_input)).clip(0) # because physics
 
-        # For each time (luminosities as proxy)
->>>>>>> Stashed changes
-        for li, lum in enumerate(self._luminosities):
-            bi = self._band_indices[li]
+        seds = []
+        for ti, time in enumerate(self._my_times):
+            bi = self._band_indices[ti]
             if bi >= 0:
-		print('ne')
                 rest_wavs = rest_wavs_dict.setdefault(
                     bi, self._sample_wavelengths[bi] / zp1)
-                print('ye')
             else:
-		print('ye')
                 rest_wavs = np.array(  # noqa: F841
-                    [czp1 / self._frequencies[li]])
-                print('ne')
+                    [czp1 / self._frequencies[ti]])
 
-            ah.append((len(rest_wavs)))
-            # Find corresponding closest time
-            t_closest_i = (np.abs(self._kasen_times-self._my_times[li])).argmin()
-            # Evaluate the SED at the rest frame wavelengths 
-            sed = np.array([])
-            for w in rest_wavs:
-            # find index of closest wav
-                w_closest_i = np.abs(self._kasen_wavs-w).argmin()
-                sed = np.append(sed, weight * kasen_seds['SEDs'][t_closest_i][w_closest_i] )
-	  
-           
+            closest_wavs = self.closest_wavs_ind(rest_wavs)
 
-            # replace array w/very small val if t = 0 (hacky fix but whatver I have like two thesis weeks left)
-            if self._my_times[li] == 0.0:
-                sed[sed >= 0.] = 1.e30 # should be all values (can't have neg luminosity
- 
-            # Calculate luminosity from sed
-            L_t = np.trapz(weight * kasen_seds['SEDs'][t_closest_i], x=self._kasen_wavs)
-            self._luminosities[li] = self._luminosities[li] +  L_t
-            lums0.append(L_t)
+            sed = weight * predictions[ti][closest_wavs]
+            if time <= 1e-8:
+                sed[sed >= 0.] = 1.e30  # should be all values (can't have neg luminosity
+
             seds.append(sed)
-        print(ah)
-        #This line turns all the nans to 0s
+
+            lum = np.trapz(weight * predictions[ti], x=self.kasen_wavs)
+            self._luminosities[ti] = self._luminosities[ti] + lum
+            lums.append(lum)
+
+        # This line turns all nans to 0s
         seds[-1][np.isnan(seds[-1])] = 0.0
-        return {'sample_wavelengths': self._sample_wavelengths, 'seds': seds,  'lum_0': lums0}
+        seds = self.add_to_existing_seds(seds, **kwargs)
+        return {'sample_wavelengths': self._sample_wavelengths, 'seds': seds,  'lum_0': lums}
