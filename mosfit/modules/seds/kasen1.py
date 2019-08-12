@@ -35,17 +35,17 @@ class Kasen1(SED):
         super(Kasen1, self).__init__(**kwargs)
 
         # Read in times and frequencies arrays (same for all SEDs)
-        self._dir_path = '/data/des51.b/data/kamile/'
-        self._kasen_wavs = pickle.load( open(os.path.join(self._dir_path, 'kasen_seds/wavelength_angstroms.p'), "rb"))
-        self._kasen_times = pickle.load( open(os.path.join(self._dir_path, 'kasen_seds/times_days.p'), "rb"))
+        self._dir_path = os.path.dirname(os.path.realpath(__file__))
+        self._kasen_wavs = pickle.load( open(os.path.join(self._dir_path, 'wavelength_angstroms.p'), "rb"))
+        self._kasen_times = pickle.load( open(os.path.join(self._dir_path, 'times_days.p'), "rb"))
 
         # create in memory the kasen_seds to later pick from 
         self._all_kasen_seds = []
         for m in self.MASS_S:
             for v in self.VKIN_S:
                 for x in self.XLAN_S:
-                            fname = 'kasen_seds/knova_d1_n10_m' + m + '_vk' + v + '_fd1.0_Xlan' + x + '.0.p'
-                            if fname == 'kasen_seds/knova_d1_n10_m0.1_vk0.30_fd1.0_Xlan1e-1.0.p':
+                            fname = 'kasen_seds_pickles/knova_d1_n10_m' + m + '_vk' + v + '_fd1.0_Xlan' + x + '.0.p'
+                            if fname == 'kasen_seds_pickles/knova_d1_n10_m0.1_vk0.30_fd1.0_Xlan1e-1.0.p':
                                 continue
                             kasen_sed = pickle.load( open(os.path.join(self._dir_path, fname) , "rb" ))
                             self._all_kasen_seds.append(kasen_sed)
