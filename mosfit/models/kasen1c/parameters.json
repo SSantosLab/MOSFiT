@@ -1,0 +1,17 @@
+{
+    "nhhost":{
+        "value":7e20
+    },
+    "texplosion":{
+        "value": 0.0
+    },
+    "vk":{
+        "value":0.1
+    },
+    "Msph":{
+        "value":0.04
+    },
+    "xlan":{
+        "value":1e-2
+    }
+}

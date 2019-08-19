@@ -1,0 +1,96 @@
+{
+    "@references":[
+        {
+            "bibcode": "2017arXiv170708132V"
+        },
+        {
+            "bibcode": "2017arXiv171011576V"
+        }
+    ],
+   "ebv":{
+        "kind":"parameter",
+        "value":0.0,
+        "class":"parameter",
+        "inputs":[
+            "transient"
+        ],
+        "latex":"E({\\rm B} - {\\rm V})"
+    },
+    "nhhost":{
+        "kind":"parameter",
+        "value":1.0e14,
+        "class":"parameter",
+        "latex":"n_{\\rm H,host}",
+        "derived_keys":"avhost"
+    },
+    "redshift":{
+        "kind":"parameter",
+        "value":0.009727,
+        "class":"parameter",
+        "latex":"z"
+    },
+    "lumdist":{
+        "kind":"parameter",
+        "value":43.36,
+        "class":"parameter",
+        "latex":"d"
+    },
+    "texplosion":{
+        "kind":"parameter",
+        "value":0.0,
+        "class":"parameter",
+        "latex":"t_{\\rm exp}\\,{\\rm (days)}",
+        "requests":{
+            "min_times": "transient"
+        }
+    },
+    "vk":{
+        "kind":"parameter",
+        "value":0.24,
+        "class":"parameter",
+        "latex":"v"
+    },
+    "Msph":{
+        "kind":"parameter",
+        "value":0.1,
+        "class":"parameter",
+        "latex":"M"
+    },
+    "xlan":{
+        "kind":"parameter",
+        "value":1e-1,
+        "class":"parameter",
+        "latex":"X"
+    },
+    "fakelum":{
+        "kind":"engine",
+        "inputs": "densetimes"
+    },
+    "kasen1c":{
+        "kind":"sed",
+        "inputs":[
+            "fakelum",
+	    "densetimes",
+            "texplosion",
+            "redshift",
+	    "vk",
+	    "xlan",
+	    "Msph"
+        ],
+        "requests":{
+            "band_wave_ranges": "photometry"
+        }
+    },
+    "photometry":{
+        "kind":"observable",
+        "supports":[
+            "ultraviolet",
+	         "optical",
+            "infrared"
+        ],
+        "inputs":[
+            "kasen1c",
+            "lumdist"
+        ]
+}
+    }
