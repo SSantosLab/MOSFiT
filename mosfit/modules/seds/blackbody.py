@@ -29,6 +29,7 @@ class Blackbody(SED):
         self._bands = kwargs['all_bands']
         self._band_indices = kwargs['all_band_indices']
         self._frequencies = kwargs['all_frequencies']
+        print('lums', type(self._luminosities))
         self._radius_phot = kwargs[self.key('radiusphot')]
         self._temperature_phot = kwargs[self.key('temperaturephot')]
         xc = self.X_CONST  # noqa: F841
@@ -59,6 +60,8 @@ class Blackbody(SED):
                 rest_wavs = np.array(  # noqa: F841
                     [czp1 / self._frequencies[li]])
 
+            print(rest_wavs)
+
             radius_phot = self._radius_phot[li]  # noqa: F841
             temperature_phot = self._temperature_phot[li]  # noqa: F841
 
@@ -73,6 +76,7 @@ class Blackbody(SED):
             seds[-1][np.isnan(seds[-1])] = 0.0
 
         seds = self.add_to_existing_seds(seds, **kwargs)
-
+        #print(type(seds))
+        #print(seds)
         # Units of `seds` is ergs / s / Angstrom.
         return {'sample_wavelengths': self._sample_wavelengths, 'seds': seds}
