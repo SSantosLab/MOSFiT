@@ -5,30 +5,13 @@
     "texplosion":{
         "value": 0.0
     },
-    "theta":{
-        "min_value":0.0,
-        "max_value":1.57,
-        "log":false
-    },
-    "phi":{
-        "value":0.01
-    },
-    "vk1":{
+    "v":{
         "value":0.1
     },
-    "Msph1":{
+    "M":{
         "value":0.04
     },
-    "xlan1":{
-        "value":1e-2
-    },
-    "vk0":{
-        "value":0.3
-    },
-    "Msph0":{
-        "value":0.025
-    },
-    "xlan0":{
+    "X":{
         "value":1e-4
     }
 }

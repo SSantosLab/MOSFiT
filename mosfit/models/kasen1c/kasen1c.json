@@ -44,102 +44,41 @@
             "min_times": "transient"
         }
     },
-    "theta":{
-	   "kind":"parameter",
-	   "value":0.6981317008,
-	   "class":"parameter",
-	   "latex":"\\theta"
-    },
-    "phi":{
-        "kind":"parameter",
-        "value":1.0471975512,
-        "class":"parameter",
-        "latex":"\\phi"
-    },
-    "vk1":{
+    "v":{
         "kind":"parameter",
         "value":0.24,
         "class":"parameter",
-        "latex":"v_{k1}"
+        "latex":"v"
     },
-    "Msph1":{
+    "M":{
         "kind":"parameter",
         "value":0.1,
         "class":"parameter",
-        "latex":"M_1"
+        "latex":"M"
     },
-    "xlan1":{
+    "X":{
         "kind":"parameter",
         "value":1e-1,
         "class":"parameter",
-        "latex":"X_1"
-    },
-    "vk0":{
-        "kind":"parameter",
-        "value":0.36,
-        "class":"parameter",
-        "latex":"v_{k0}"
-    },
-    "Msph0":{
-        "kind":"parameter",
-        "value":0.075,
-        "class":"parameter",
-        "latex":"M_0"
-    },
-    "xlan0":{
-        "kind":"parameter",
-        "value":1e-1,
-        "class":"parameter",
-        "latex":"X_0"
+        "latex":"X"
     },
     "fakelum":{
         "kind":"engine",
         "inputs": "densetimes"
     },
-    "kasen0":{
+    "kasen1c":{
         "kind":"sed",
         "inputs":[
             "fakelum",
 	    "densetimes",
             "texplosion",
             "redshift",
-            "theta",
-            "phi",
-	    "vk0",
-	    "xlan0",
-	    "Msph0"
+	    "v",
+	    "X",
+	    "M"
         ],
         "requests":{
             "band_wave_ranges": "photometry"
-        },
-        "replacements":{
-            "vk":"vk0",
-            "xlan":"xlan0",
-            "Msph": "Msph0"
-        }
-    },
-    "kasen1":{
-        "kind":"sed",
-        "inputs":[
-      	   "fakelum",
-	   "densetimes",
-            "texplosion",
-            "redshift",
-            "theta",
-            "phi",
-	    "vk1",
-	    "Msph1",
-	    "xlan1",
-            "kasen0"
-        ],
-        "requests":{
-            "band_wave_ranges": "photometry",
-	    "seds": "kasen0"
-        },
-        "replacements":{
-            "vk":"vk1",
-            "xlan":"xlan1",
-            "Msph":"Msph1"
         }
     },
     "photometry":{
@@ -150,7 +89,7 @@
             "infrared"
         ],
         "inputs":[
-            "kasen1",
+            "kasen1c",
             "lumdist"
         ]
 }
