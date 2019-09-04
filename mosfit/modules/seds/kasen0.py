@@ -16,6 +16,7 @@ class Kasen0(SED):
     Defining the Kasen-simulation based SED
 
     FOR TYPE 0 == SHOCK HEATED EJECTA
+    BLUE
     #Frankencode
     Kamile Lukosiute August 2019
     """
@@ -43,9 +44,7 @@ class Kasen0(SED):
         :param phi:
         :return: mass weight
         """
-        return (0.5 * ((2 + np.cos(phi)) *
-                (1 - np.cos(phi)) ** 2 +
-                (np.sin(phi) ** 2) * np.cos(phi)))
+        return 1./(1. - np.cos(phi))
 
     @staticmethod
     def g_weight(phi, theta):
@@ -174,6 +173,7 @@ class Kasen0(SED):
             seds.append(sed)
 
             lum = np.trapz(weight * predictions[ti], x=self.kasen_wavs)
+            lum = np.zeros_like(lum)
             self._luminosities[ti] = self._luminosities[ti] + lum
             lums.append(lum)
 

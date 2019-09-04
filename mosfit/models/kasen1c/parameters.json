@@ -6,12 +6,15 @@
         "value": 0.0
     },
     "v":{
-        "value":0.1
+        "min_value":0.03,
+	"max_value": 0.4
     },
     "M":{
-        "value":0.04
+        "min_value":0.001,
+	"max_value": 0.05
     },
     "X":{
-        "value":1e-4
+	"min_value": 1e-9,
+        "max_value":1e-1
     }
 }

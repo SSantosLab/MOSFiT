@@ -787,7 +787,6 @@ class Model(object):
         Draw a walker randomly from the full range of all parameters, reject
         walkers that return invalid scores.
         """
-        print('from draw_walker..')
         if self._fitter.true_vals: # if i've specified true values
             true_vals_range = {u'theta':[0., 1.57], u'phi':[0.17, 1.39]}
             true_vals = {}        
